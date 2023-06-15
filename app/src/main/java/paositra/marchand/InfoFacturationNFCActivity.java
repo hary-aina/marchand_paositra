@@ -18,7 +18,7 @@ public class InfoFacturationNFCActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         getSupportActionBar().hide();
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_info_facturation_nf);
+        setContentView(R.layout.activity_info_facturation_nfc);
 
         //changement des informations automatiques
         preferences = getSharedPreferences(confPref, Context.MODE_PRIVATE);
