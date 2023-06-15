@@ -51,6 +51,15 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        //start info facture nfc Activity
+        ImageButton nfcBtn = view.findViewById(R.id.nfcBtn);
+        nfcBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startInfoFacturationNFC(v);
+            }
+        });
+
         //logout
         ImageButton logoutBtn = view.findViewById(R.id.logout);
         logoutBtn.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +76,12 @@ public class HomeFragment extends Fragment {
     public void startInfoMarchand(View v){
         Intent infoMarchandActivity = new Intent(v.getContext().getApplicationContext(), InfoMarchandActivity.class);
         startActivity(infoMarchandActivity);
+    }
+
+    //start nfc paiement
+    public void startInfoFacturationNFC(View v){
+        Intent infoFacturationActivity = new Intent(v.getContext().getApplicationContext(), InfoFacturationNFCActivity.class);
+        startActivity(infoFacturationActivity);
     }
 
     public void deconnexion(){
