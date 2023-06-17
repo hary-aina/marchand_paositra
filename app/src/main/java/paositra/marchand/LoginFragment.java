@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -43,9 +44,11 @@ public class LoginFragment extends Fragment implements NetworkChangeReceiver.OnN
             Toast.makeText(getContext(), "Connecter au reseau wi-fi", Toast.LENGTH_SHORT).show();
             Button loginBtn = getActivity().findViewById(R.id.loginBtn);
             loginBtn.setEnabled(true);
+            loginBtn.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.danger));
         }else{
             Button loginBtn = getActivity().findViewById(R.id.loginBtn);
             loginBtn.setEnabled(false);
+            loginBtn.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.neutral));
             Toast.makeText(getContext(), "Non connecter au reseau wi-fi", Toast.LENGTH_SHORT).show();
         }
     }
