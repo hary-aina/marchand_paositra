@@ -3,25 +3,26 @@ package paositra.marchand;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
     private final static String confPref = "conf_client";
     SharedPreferences preferences;
+    private PendingIntent pendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getSupportActionBar().hide();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,getClass()).
+                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
         //verification si le client c'est dejà authentifier
         preferences = getSharedPreferences(confPref, Context.MODE_PRIVATE);
@@ -31,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
         }else{
             loadHome();
         }
-
     }
+
 
     public void loadLogin(){
         LoginFragment fragment_login = new LoginFragment();

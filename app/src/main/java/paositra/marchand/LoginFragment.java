@@ -1,9 +1,12 @@
 package paositra.marchand;
 
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -12,23 +15,43 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class LoginFragment extends Fragment {
+import paositra.marchand.utils.NetworkChangeReceiver;
+
+public class LoginFragment extends Fragment implements NetworkChangeReceiver.OnNetworkChangeListener {
 
     private final static String confPref = "conf_client";
     SharedPreferences preferences;
-
-    public LoginFragment() {
-        // Required empty public constructor
-    }
+    private NetworkChangeReceiver networkChangeReceiver;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
+    public void onResume() {
+        super.onResume();
+        networkChangeReceiver = new NetworkChangeReceiver(this);
+        requireActivity().registerReceiver(networkChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        requireActivity().unregisterReceiver(networkChangeReceiver);
+        networkChangeReceiver = null;
+    }
+    @Override
+    public void onNetworkChanged(boolean isConnected) {
+        if(isConnected){
+            Toast.makeText(getContext(), "Connecter au reseau wi-fi", Toast.LENGTH_SHORT).show();
+            Button loginBtn = getActivity().findViewById(R.id.loginBtn);
+            loginBtn.setEnabled(true);
+        }else{
+            Button loginBtn = getActivity().findViewById(R.id.loginBtn);
+            loginBtn.setEnabled(false);
+            Toast.makeText(getContext(), "Non connecter au reseau wi-fi", Toast.LENGTH_SHORT).show();
         }
     }
 
+    public LoginFragment() {
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -70,7 +93,6 @@ public class LoginFragment extends Fragment {
 
         return view;
     }
-
     public boolean verificationChamp(View v){
         boolean result = true;
         //verification du champ login
