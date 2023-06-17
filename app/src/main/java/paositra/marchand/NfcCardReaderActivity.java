@@ -11,6 +11,8 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -26,6 +28,15 @@ public class NfcCardReaderActivity extends AppCompatActivity implements NfcAdapt
         getSupportActionBar().hide();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfc_card_reader);
+
+        //finish
+        ImageButton returnBtn = (ImageButton)findViewById(R.id.retour);
+        returnBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         //verification de l'existence d'appareil NFC sur le mobile
         //Get default NfcAdapter and PendingIntent instances

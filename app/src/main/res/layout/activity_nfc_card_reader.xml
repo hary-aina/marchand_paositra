@@ -6,4 +6,73 @@
     android:layout_height="match_parent"
     tools:context=".NfcCardReaderActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/baniere"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/primary"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/retour"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/primary"
+                android:paddingLeft="-80dp"
+                android:src="@drawable/left_32px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:text="Facturation NFC"
+                android:textColor="@color/white"
+                android:textSize="22dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Veuillez rapprocher le smartphone en mode emulation de carte sur ce terminal de paiement"
+                android:textColor="@color/neutral"
+                android:layout_marginVertical="10dp"
+                android:textStyle="bold"/>
+
+            <ImageView
+                android:layout_marginTop="50dp"
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="420dp"
+                app:srcCompat="@drawable/card_reader"
+                android:rotation="90"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lecture .."
+                android:textColor="@color/neutral"
+                android:textAlignment="center"
+                android:layout_marginVertical="10dp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
