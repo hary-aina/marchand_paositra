@@ -52,6 +52,24 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/lost_connexion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/danger"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="connexion perdue"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/info_compte"
             android:layout_width="match_parent"
             android:layout_height="120dp"
