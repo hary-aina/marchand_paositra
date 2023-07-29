@@ -1,6 +1,6 @@
 package paositra.marchand.service;
 
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -16,21 +16,21 @@ public interface ApiService {
     //login marchand
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     @POST("auth/loginUserMarchand")
-    Call<JSONObject> login(@Body RequestBody requestBody);
+    Call<JsonObject> login(@Body RequestBody requestBody);
 
     //get solde marchand
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     @GET("monetique/operationMarchand/getSoldeMarchand")
-    Call<JSONObject> getSoldeMarchand(@Header("Authorization") String authorization);
+    Call<JsonObject> getSoldeMarchand(@Header("Authorization") String authorization);
 
     //initialisation paiement
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     @GET("monetique/operationMarchand/initialisationRetraitEspeceWithCodeRetrait")
-    Call<JSONObject> initialisationRetraitEspeceWithCodeRetrait(@Header("Authorization") String authorization, @Body RequestBody requestBody);
+    Call<JsonObject> initialisationRetraitEspeceWithCodeRetrait(@Header("Authorization") String authorization, @Body RequestBody requestBody);
 
     //validation paiement
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     @GET("monetique/operationMarchand/validationRetraitEspeceByCodeRetrait")
-    Call<JSONObject> validationRetraitEspeceByCodeRetrait(@Header("Authorization") String authorization, @Body RequestBody requestBody);
+    Call<JsonObject> validationRetraitEspeceByCodeRetrait(@Header("Authorization") String authorization, @Body RequestBody requestBody);
 
 }
