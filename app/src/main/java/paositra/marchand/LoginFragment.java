@@ -48,13 +48,12 @@ public class LoginFragment extends Fragment implements NetworkChangeReceiver.OnN
     }
     @Override
     public void onNetworkChanged(boolean isConnected) {
+        Button loginBtn = getActivity().findViewById(R.id.loginBtn);
         if(isConnected){
             //Toast.makeText(getContext(), "Connecter au reseau wi-fi", Toast.LENGTH_SHORT).show();
-            Button loginBtn = getActivity().findViewById(R.id.loginBtn);
             loginBtn.setEnabled(true);
             loginBtn.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.danger));
         }else{
-            Button loginBtn = getActivity().findViewById(R.id.loginBtn);
             loginBtn.setEnabled(false);
             loginBtn.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.neutral));
             Toast.makeText(getContext(), "Non connecter au reseau wi-fi", Toast.LENGTH_SHORT).show();
