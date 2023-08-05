@@ -17,7 +17,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import paositra.marchand.clientApi.RetrofitClient;
+import paositra.marchand.service.ApiService;
 import paositra.marchand.utils.NetworkChangeReceiver;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginFragment extends Fragment implements NetworkChangeReceiver.OnNetworkChangeListener {
 
@@ -65,30 +74,7 @@ public class LoginFragment extends Fragment implements NetworkChangeReceiver.OnN
             @Override
             public void onClick(View v) {
                 if(verificationChamp(view)){
-
-                    EditText editLoginText = (EditText) view.findViewById(R.id.editLoginText);
-                    EditText editTextPassword = (EditText) view.findViewById(R.id.editTextPassword);
-
-                    //stockage des informations utilisateurs
-                    preferences = getActivity().getSharedPreferences(confPref, Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("nom", "RAVAOARISOA");
-                    editor.putString("prenom", "Marcel");
-                    editor.putString("adresse", "Lot II A Bis Ivandry");
-                    editor.putString("telephone", "+261 32 48 965 90");
-                    editor.putString("marchand", "Antaninarenina");
-                    editor.putString("numero_caisse", "006");
-
-                    editor.putString("login", editLoginText.getText().toString());
-                    editor.putString("password", editTextPassword.getText().toString());
-                    editor.putString("idCaissier", "1");
-                    editor.putString("solde_compte", "20000000");
-                    editor.putString("solde_carte", "200000");
-                    editor.putString("token", "ujubeizhevuzjvbezrhbvzoerbveezouvbrvhrvizbr");
-
-                    editor.commit();
-
-                    ((MainActivity)getActivity()).loadHome();
+                    authetification(view);
                 }
             }
         });
@@ -121,6 +107,105 @@ public class LoginFragment extends Fragment implements NetworkChangeReceiver.OnN
         }
 
         return result;
+    }
+
+    //access au serveur a revoir
+    private void authetification(View v){
+
+        EditText editTextPassword = (EditText) v.findViewById(R.id.editTextPassword);
+        EditText editLoginText = (EditText) v.findViewById(R.id.editLoginText);
+        String login = editLoginText.getText().toString();
+        String mot_de_passe = editTextPassword.getText().toString();
+
+        //initialisation de la connexion vers le serveur
+        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+
+        // Create the JSON string you want to send
+        String jsonString = "{\"login\":\""+login+"\",\"password\":"+mot_de_passe+"}";
+        // Convert the JSON string to RequestBody
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonString);
+
+        Call<JsonObject> call = apiService.login(requestBody);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+                System.out.println(response);
+
+                if(response.isSuccessful()){
+
+                    JsonObject responsebody = response.body();
+
+                    boolean error = responsebody.get("error").getAsBoolean();
+                    int code = responsebody.get("code").getAsInt();
+                    if((!error) && code == 200){
+
+                        JsonObject data = responsebody.get("data").getAsJsonObject();
+
+                        //recuperation token
+                        String token = data.get("access_token").getAsString();
+
+                        //recuperation info beneficiaire
+                        JsonObject user_marchand = data.get("info_user_marchand").getAsJsonObject();
+                        String idUser = user_marchand.get("iduser").getAsString();
+                        String nom = user_marchand.get("nom").getAsString();
+                        String prenom = user_marchand.get("prenom").getAsString();
+                        String telephone = user_marchand.get("telephone").getAsString();
+                        String login = user_marchand.get("login").getAsString();
+
+                        /*String quichet = "";
+                        if(user_marchand.get("guichet").isJsonNull()){
+                            quichet = user_marchand.get("guichet").getAsString();
+                        }
+                        String fk_marchand = user_marchand.get("fk_marchand").getAsString();*/
+
+                        //information caisse
+                        JsonObject info_caisse = data.get("info_caisse").getAsJsonObject();
+                        //String code_marchand = info_caisse.get("code_marchand").getAsString();
+                        String numero_caisse = info_caisse.get("numero_caisse").getAsString();
+
+                        //information solde
+                        JsonObject marchand = data.get("marchand").getAsJsonObject();
+                        double solde = marchand.get("solde").getAsDouble();
+                        double solde_carte = marchand.get("solde_carte").getAsDouble();
+
+                        //stockage des informations utilisateurs
+                        preferences = getActivity().getSharedPreferences(confPref, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("nom", nom);
+                        editor.putString("prenom", prenom);
+                        editor.putString("adresse", "");
+                        editor.putString("telephone", telephone);
+                        editor.putString("marchand", "Shop Liantsoa");
+                        editor.putString("numero_caisse", numero_caisse);
+
+                        editor.putString("login", login);
+                        editor.putString("password", mot_de_passe);
+                        editor.putString("idUser", idUser);
+                        editor.putString("solde_compte", ""+solde);
+                        editor.putString("solde_carte", ""+solde_carte);
+                        editor.putString("token", token);
+
+                        editor.commit();
+
+                        ((MainActivity)getActivity()).loadHome();
+
+                    }else{
+                        String message = responsebody.get("msg").getAsString();
+                        Toast.makeText(v.getContext(), message, Toast.LENGTH_LONG).show();
+                    }
+
+                }else{
+                    Toast.makeText(v.getContext(), "ERREUR DE SERVICE", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                System.out.println(t);
+                Toast.makeText(v.getContext(), "ERREUR SERVEUR", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 }
