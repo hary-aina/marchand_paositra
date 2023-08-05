@@ -23,11 +23,19 @@ public class NfcCardReaderActivity extends AppCompatActivity implements NfcAdapt
     private NfcAdapter nfcAdapter;
     private PendingIntent pendingIntent;
 
+    private String montant;
+    private String detail_achat;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getSupportActionBar().hide();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfc_card_reader);
+
+        //get text from intent
+        Intent intent = getIntent();
+        montant = intent.getStringExtra("montant");
+        detail_achat = intent.getStringExtra("detail_achat");
 
         //finish
         ImageButton returnBtn = (ImageButton)findViewById(R.id.retour);
@@ -94,12 +102,36 @@ public class NfcCardReaderActivity extends AppCompatActivity implements NfcAdapt
         Activity here = this;
         try {
             isoDep.connect();
-            byte[] response = isoDep.transceive(Utils.hexStringToByteArray(
+            byte[] responseAPDU = isoDep.transceive(Utils.hexStringToByteArray(
                     "00A4040007A0000002471001"));
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(here, "\nCard Response: " + Utils.toHex(response), Toast.LENGTH_LONG).show();
+                    String response =  Utils.toHex(responseAPDU);
+                    String[] responseArray = response.split("|");
+
+                    if(responseArray.length == 2 && responseArray[0].equals(Utils.STATUS_SUCCESS) ){
+
+                        //initialisation code retrait (ajout endpoint ici)
+
+
+                        //send some extra data if success
+                        Intent validationCodeActivity = new Intent(here, ValidationCodeActivity.class);
+                        validationCodeActivity.putExtra("montant", montant);
+                        validationCodeActivity.putExtra("detail_achat", detail_achat);
+                        validationCodeActivity.putExtra("telephone", responseArray[1]);
+                        startActivity(validationCodeActivity);
+                        finish();
+
+                    }else if(responseArray[0].equals(Utils.STATUS_FAILED)){
+                        Toast.makeText(here, "Echec de la lecture", Toast.LENGTH_LONG).show();
+                    }else if(responseArray[0].equals(Utils.CLA_NOT_SUPPORTED)){
+                        Toast.makeText(here, "classe de commande non supportée", Toast.LENGTH_LONG).show();
+                    }else if(responseArray[0].equals(Utils.INS_NOT_SUPPORTED)){
+                        Toast.makeText(here, "code d'instruction non supporté", Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(here, "\nCard Response: " + response, Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         } catch (IOException e) {

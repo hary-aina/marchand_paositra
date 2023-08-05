@@ -1,6 +1,11 @@
 package paositra.marchand.utils;
 
 public class NfcUtils {
+
+    public static final String STATUS_SUCCESS = "9000";
+    public static final String STATUS_FAILED = "6F00";
+    public static final String CLA_NOT_SUPPORTED = "6E00";
+    public static final String INS_NOT_SUPPORTED = "6D00";
     private static final String HEX_CHARS = "0123456789ABCDEF";
 
     public static byte[] hexStringToByteArray(String data) {

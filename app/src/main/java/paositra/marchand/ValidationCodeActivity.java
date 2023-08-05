@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import paositra.marchand.utils.NetworkChangeReceiver;
 
-public class InfoFacturationNFCActivity extends AppCompatActivity implements NetworkChangeReceiver.OnNetworkChangeListener {
+public class ValidationCodeActivity extends AppCompatActivity implements NetworkChangeReceiver.OnNetworkChangeListener{
 
     private final static String confPref = "conf_client";
     SharedPreferences preferences;
@@ -29,7 +29,7 @@ public class InfoFacturationNFCActivity extends AppCompatActivity implements Net
     protected void onCreate(Bundle savedInstanceState) {
         getSupportActionBar().hide();
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_info_facturation_nfc);
+        setContentView(R.layout.activity_validation_code);
         networkChangeReceiver = new NetworkChangeReceiver(this);
 
         //changement des informations automatiques
@@ -39,14 +39,17 @@ public class InfoFacturationNFCActivity extends AppCompatActivity implements Net
         TextView marchand = (TextView) findViewById(R.id.marchand);
         marchand.setText(preferences.getString("marchand", ""));
 
-        //start NFC card reader
-        Button launch_NFC_Reader = (Button)findViewById(R.id.launch_NFC_Reader);
-        launch_NFC_Reader.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startNfcCardReader(v);
-            }
-        });
+        //get intent extra
+        Intent intent = getIntent();
+        String montant = intent.getStringExtra("montant");
+        TextView montantTextView = (TextView) findViewById(R.id.montant);
+        montantTextView.setText(montant);
+        String detail_achat = intent.getStringExtra("detail_achat");
+        TextView detail_achatTextView = (TextView) findViewById(R.id.detail_achat);
+        detail_achatTextView.setText(detail_achat);
+        String telephone = intent.getStringExtra("telephone");
+        TextView telephoneTextView = (TextView) findViewById(R.id.telephone);
+        telephoneTextView.setText(telephone);
 
         //finish
         ImageButton returnBtn = (ImageButton)findViewById(R.id.retour);
@@ -75,34 +78,22 @@ public class InfoFacturationNFCActivity extends AppCompatActivity implements Net
             LinearLayout lost_connexion = findViewById(R.id.lost_connexion);
             lost_connexion.setVisibility(View.GONE);
 
-            Button launch_NFC_Reader = findViewById(R.id.launch_NFC_Reader);
-            launch_NFC_Reader.setEnabled(true);
-            launch_NFC_Reader.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.secondary));
-
         }else{
             Toast.makeText(this, "Non connecter au reseau wi-fi", Toast.LENGTH_SHORT).show();
             LinearLayout lost_connexion = findViewById(R.id.lost_connexion);
             lost_connexion.setVisibility(View.VISIBLE);
-
-            Button launch_NFC_Reader = findViewById(R.id.launch_NFC_Reader);
-            launch_NFC_Reader.setEnabled(false);
-            launch_NFC_Reader.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.neutral));
         }
     }
 
-    //start NFC card reader
-    public void startNfcCardReader(View v){
-        Intent nfcCardReaderActivity = new Intent(v.getContext().getApplicationContext(), NfcCardReaderActivity.class);
+    private void validationAchat(){
+        TextView montantTextView = (TextView) findViewById(R.id.montant);
+        TextView detail_achatTextView = (TextView) findViewById(R.id.detail_achat);
+        TextView telephoneTextView = (TextView) findViewById(R.id.telephone);
+        EditText code_retrait = (EditText) findViewById(R.id.code_retrait);
 
-        EditText montantEdit = (EditText) findViewById(R.id.montant);
-        EditText detail_achatEdit = (EditText) findViewById(R.id.detail_achat);
+        //appel endpoint ici
 
-        String montant = montantEdit.getText().toString();
-        String detail_achat = detail_achatEdit.getText().toString();
 
-        nfcCardReaderActivity.putExtra("montant", montant);
-        nfcCardReaderActivity.putExtra("detail_achat", detail_achat);
-
-        startActivity(nfcCardReaderActivity);
     }
+
 }

@@ -88,14 +88,14 @@
                         android:textStyle="bold"
                         android:textColor="@color/black"/>
 
-                    <EditText
+                    <TextView
                         android:id="@+id/montant"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:inputType="text"
-                        android:backgroundTint="@color/black"
+                        android:text="0"
+                        android:backgroundTint="@color/neutral"
                         android:textAlignment="textEnd"/>
 
                 </TableRow>
@@ -118,15 +118,15 @@
                             android:textStyle="bold"
                             android:textColor="@color/black"/>
 
-                        <EditText
+                        <TextView
                             android:id="@+id/detail_achat"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:ems="10"
+                            android:text=" - achat course"
                             android:gravity="start|top"
-                            android:inputType="textMultiLine"
-                            android:backgroundTint="@color/black"/>
+                            android:backgroundTint="@color/neutral"/>
 
                     </LinearLayout>
 
@@ -178,17 +178,48 @@
 
                 </TableRow>
 
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Telephone client:"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"/>
+
+                    <TextView
+                        android:id="@+id/telephone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="00261325489678"
+                        android:textColor="@color/neutral"
+                        android:textAlignment="center"/>
+
+                </TableRow>
+
             </TableLayout>
 
+            <EditText
+                android:layout_marginTop="50dp"
+                android:id="@+id/code_retrait"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="text"
+                android:hint="saisir le code retrait" />
+
             <Button
-                android:id="@+id/launch_NFC_Reader"
+                android:id="@+id/validate_achat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Lancer terminal de paiement"
                 android:backgroundTint="@color/secondary"
-                android:textColor="@color/black"
-                android:layout_marginTop="50dp"/>
+                android:text="Valider achat"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
