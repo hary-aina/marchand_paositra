@@ -160,7 +160,6 @@ public class NfcCardReaderActivity extends AppCompatActivity implements NfcAdapt
                             @Override
                             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                                 if(response.isSuccessful()){
-
                                     JsonObject responsebody = response.body();
                                     boolean error = responsebody.get("error").getAsBoolean();
                                     int code = responsebody.get("code").getAsInt();

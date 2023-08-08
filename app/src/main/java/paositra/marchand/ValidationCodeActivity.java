@@ -17,7 +17,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import paositra.marchand.clientApi.RetrofitClient;
+import paositra.marchand.service.ApiService;
 import paositra.marchand.utils.NetworkChangeReceiver;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ValidationCodeActivity extends AppCompatActivity implements NetworkChangeReceiver.OnNetworkChangeListener{
 
@@ -87,11 +96,109 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
 
     private void validationAchat(){
         TextView montantTextView = (TextView) findViewById(R.id.montant);
+        String montant = montantTextView.getText().toString();
         TextView detail_achatTextView = (TextView) findViewById(R.id.detail_achat);
+        String detail_achat = detail_achatTextView.getText().toString();
         TextView telephoneTextView = (TextView) findViewById(R.id.telephone);
-        EditText code_retrait = (EditText) findViewById(R.id.code_retrait);
+        String telephone = telephoneTextView.getText().toString();
+        EditText code_retraitEditText = (EditText) findViewById(R.id.code_retrait);
+        String code_retrait = code_retraitEditText.getText().toString();
 
-        //appel endpoint ici
+        preferences = getSharedPreferences(confPref, Context.MODE_PRIVATE);
+        String token = preferences.getString("token", "");
+
+        //initialisation de la connexion vers le serveur
+        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+        // Create the JSON string you want to send
+        String jsonString = "{\"telephone\":\""+telephone+"\",\"montant\":\""+montant+"\",\"code\":\""+code_retrait+"\",\"commentaire\":\""+detail_achat+"\"}";
+        // Convert the JSON string to RequestBody
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonString);
+        Call<JsonObject> call = apiService.validationRetraitEspeceByCodeRetrait(token, requestBody);
+
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if(response.isSuccessful()){
+                    JsonObject responsebody = response.body();
+                    boolean error = responsebody.get("error").getAsBoolean();
+                    int code = responsebody.get("code").getAsInt();
+
+                    if(code == 401 || code == 403){
+                        //erreur token refaire l'authentification
+                        Toast.makeText(getApplication(), "RECONNEXION REQUIS", Toast.LENGTH_LONG).show();
+                        preferences = getSharedPreferences(confPref, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.clear();
+                        editor.commit();
+                        Intent MainActivity = new Intent(getApplication(), MainActivity.class);
+                        startActivity(MainActivity);
+                        finish();
+
+                    } else if (error == true) {
+                        //erreu de service
+                        JsonObject data = responsebody.get("data").getAsJsonObject();
+                        String message = data.get("errorMessage").getAsString();
+                        Toast.makeText(getApplication(), message, Toast.LENGTH_LONG).show();
+
+                    }else{
+                        //success
+                        //generer une facture
+
+                        //consultation de nouveau solde
+                        Call<JsonObject> call2 = apiService.getSoldeMarchand(token);
+                        call2.enqueue(new Callback<JsonObject>() {
+                            @Override
+                            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                                if(response.isSuccessful()){
+                                    JsonObject responsebody = response.body();
+                                    boolean error = responsebody.get("error").getAsBoolean();
+                                    int code = responsebody.get("code").getAsInt();
+
+                                    if(code == 401 || code == 403){
+                                        //erreur token refaire l'authentification
+                                        Toast.makeText(getApplication(), "RECONNEXION REQUIS", Toast.LENGTH_LONG).show();
+                                        preferences = getSharedPreferences(confPref, Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = preferences.edit();
+                                        editor.clear();
+                                        editor.commit();
+                                        Intent MainActivity = new Intent(getApplication(), MainActivity.class);
+                                        startActivity(MainActivity);
+                                        finish();
+
+                                    } else if (error == true) {
+                                        //erreu de service
+                                        JsonObject data = responsebody.get("data").getAsJsonObject();
+                                        String message = data.get("errorMessage").getAsString();
+                                        Toast.makeText(getApplication(), message, Toast.LENGTH_LONG).show();
+
+                                    }else{
+                                        preferences = getSharedPreferences(confPref, Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = preferences.edit();
+                                        JsonObject data = responsebody.get("data").getAsJsonObject();
+                                        editor.putString("solde_compte", ""+data.get("solde").getAsString());
+                                        editor.putString("solde_carte", ""+data.get("solde_carte").getAsString());
+                                    }
+
+                                }else{
+                                    Toast.makeText(getApplication(), "ERREUR DE SERVICE", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                            @Override
+                            public void onFailure(Call<JsonObject> call, Throwable t) {
+                                Toast.makeText(getApplication(), "ERREUR SERVEUR", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }else{
+                    Toast.makeText(getApplication(), "ERREUR DE SERVICE", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(getApplication(), "ERREUR SERVEUR", Toast.LENGTH_LONG).show();
+            }
+        });
 
 
     }
