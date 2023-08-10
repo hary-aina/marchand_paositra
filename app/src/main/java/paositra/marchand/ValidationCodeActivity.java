@@ -113,7 +113,7 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
         String jsonString = "{\"telephone\":\""+telephone+"\",\"montant\":\""+montant+"\",\"code\":\""+code_retrait+"\",\"commentaire\":\""+detail_achat+"\"}";
         // Convert the JSON string to RequestBody
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonString);
-        Call<JsonObject> call = apiService.validationRetraitEspeceByCodeRetrait(token, requestBody);
+        Call<JsonObject> call = apiService.validationRetraitEspeceByCodeRetrait("Bearer "+token, requestBody);
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
@@ -145,7 +145,7 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
                         //generer une facture
 
                         //consultation de nouveau solde
-                        Call<JsonObject> call2 = apiService.getSoldeMarchand(token);
+                        Call<JsonObject> call2 = apiService.getSoldeMarchand("Bearer "+token);
                         call2.enqueue(new Callback<JsonObject>() {
                             @Override
                             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {

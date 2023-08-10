@@ -25,12 +25,12 @@ public interface ApiService {
 
     //initialisation paiement
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
-    @GET("monetique/operationMarchand/initialisationRetraitEspeceWithCodeRetrait")
+    @POST("monetique/operationMarchand/initialisationRetraitEspeceWithCodeRetrait")
     Call<JsonObject> initialisationRetraitEspeceWithCodeRetrait(@Header("Authorization") String authorization, @Body RequestBody requestBody);
 
     //validation paiement
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
-    @GET("monetique/operationMarchand/validationRetraitEspeceByCodeRetrait")
+    @POST("monetique/operationMarchand/validationRetraitEspeceByCodeRetrait")
     Call<JsonObject> validationRetraitEspeceByCodeRetrait(@Header("Authorization") String authorization, @Body RequestBody requestBody);
 
 }

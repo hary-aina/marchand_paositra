@@ -141,9 +141,13 @@ public class NfcCardReaderActivity extends AppCompatActivity implements NfcAdapt
                 @Override
                 public void run() {
                     String response =  Utils.toHex(responseAPDU);
-                    String[] responseArray = response.split("|");
+                    String sb = response.substring(0,4);
 
-                    if(responseArray.length == 2 && responseArray[0].equals(Utils.STATUS_SUCCESS) ){
+                    if(sb.equals(Utils.STATUS_SUCCESS) ){
+
+                        String telephone = response.substring(4,18);
+
+                        //System.out.println(telephone);
 
                         /** initialisation code retrait (ajout endpoint ici) **/
 
@@ -152,10 +156,14 @@ public class NfcCardReaderActivity extends AppCompatActivity implements NfcAdapt
                         //initialisation de la connexion vers le serveur
                         ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
                         // Create the JSON string you want to send
-                        String jsonString = "{\"telephone\":\""+responseArray[1]+"\",\"montant\":"+montant+"}";
+                        String jsonString = "{\"telephone\":\""+telephone+"\",\"montant\":"+montant+"}";
+
+                        System.out.println(jsonString);
+
                         // Convert the JSON string to RequestBody
                         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonString);
-                        Call<JsonObject> call = apiService.initialisationRetraitEspeceWithCodeRetrait(token, requestBody);
+
+                        Call<JsonObject> call = apiService.initialisationRetraitEspeceWithCodeRetrait("Bearer "+token, requestBody);
                         call.enqueue(new Callback<JsonObject>() {
                             @Override
                             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -163,6 +171,8 @@ public class NfcCardReaderActivity extends AppCompatActivity implements NfcAdapt
                                     JsonObject responsebody = response.body();
                                     boolean error = responsebody.get("error").getAsBoolean();
                                     int code = responsebody.get("code").getAsInt();
+
+                                    //System.out.println(responsebody);
 
                                     if(code == 401 || code == 403){
                                         //erreur token refaire l'authentification
@@ -188,7 +198,7 @@ public class NfcCardReaderActivity extends AppCompatActivity implements NfcAdapt
                                         Intent validationCodeActivity = new Intent(here, ValidationCodeActivity.class);
                                         validationCodeActivity.putExtra("montant", montant);
                                         validationCodeActivity.putExtra("detail_achat", detail_achat);
-                                        validationCodeActivity.putExtra("telephone", responseArray[1]);
+                                        validationCodeActivity.putExtra("telephone", telephone);
                                         startActivity(validationCodeActivity);
                                         finish();
                                     }
@@ -204,11 +214,11 @@ public class NfcCardReaderActivity extends AppCompatActivity implements NfcAdapt
                             }
                         });
 
-                    }else if(responseArray[0].equals(Utils.STATUS_FAILED)){
+                    }else if(response.equals(Utils.STATUS_FAILED)){
                         Toast.makeText(here, "Echec de la lecture", Toast.LENGTH_LONG).show();
-                    }else if(responseArray[0].equals(Utils.CLA_NOT_SUPPORTED)){
+                    }else if(response.equals(Utils.CLA_NOT_SUPPORTED)){
                         Toast.makeText(here, "classe de commande non supportée", Toast.LENGTH_LONG).show();
-                    }else if(responseArray[0].equals(Utils.INS_NOT_SUPPORTED)){
+                    }else if(response.equals(Utils.INS_NOT_SUPPORTED)){
                         Toast.makeText(here, "code d'instruction non supporté", Toast.LENGTH_LONG).show();
                     }else{
                         Toast.makeText(here, "\nCard Response: " + response, Toast.LENGTH_LONG).show();
