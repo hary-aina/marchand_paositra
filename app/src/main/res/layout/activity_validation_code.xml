@@ -96,7 +96,7 @@
                         android:ems="10"
                         android:text="0"
                         android:backgroundTint="@color/neutral"
-                        android:textAlignment="textEnd"/>
+                        android:textAlignment="center"/>
 
                 </TableRow>
 

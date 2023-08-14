@@ -60,6 +60,15 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
         TextView telephoneTextView = (TextView) findViewById(R.id.telephone);
         telephoneTextView.setText(telephone);
 
+        //validation paiement
+        Button validationBtn = findViewById(R.id.validate_achat);
+        validationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validationAchat();
+            }
+        });
+
         //finish
         ImageButton returnBtn = (ImageButton)findViewById(R.id.retour);
         returnBtn.setOnClickListener(new View.OnClickListener() {
@@ -82,15 +91,17 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
     }
     @Override
     public void onNetworkChanged(boolean isConnected) {
+        Button validationBtn = findViewById(R.id.validate_achat);
         if(isConnected){
             //Toast.makeText(getContext(), "Connecter au reseau wi-fi", Toast.LENGTH_SHORT).show();
             LinearLayout lost_connexion = findViewById(R.id.lost_connexion);
             lost_connexion.setVisibility(View.GONE);
-
+            validationBtn.setEnabled(true);
         }else{
             Toast.makeText(this, "Non connecter au reseau wi-fi", Toast.LENGTH_SHORT).show();
             LinearLayout lost_connexion = findViewById(R.id.lost_connexion);
             lost_connexion.setVisibility(View.VISIBLE);
+            validationBtn.setEnabled(false);
         }
     }
 
@@ -177,6 +188,11 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
                                         JsonObject data = responsebody.get("data").getAsJsonObject();
                                         editor.putString("solde_compte", ""+data.get("solde").getAsString());
                                         editor.putString("solde_carte", ""+data.get("solde_carte").getAsString());
+                                        editor.commit();
+
+                                        Intent MainActivity = new Intent(getApplication(), MainActivity.class);
+                                        startActivity(MainActivity);
+                                        finish();
                                     }
 
                                 }else{
