@@ -3,12 +3,18 @@ package paositra.marchand;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -65,7 +71,7 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
         validationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                validationAchat();
+                validationAchat(v);
             }
         });
 
@@ -105,7 +111,7 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
         }
     }
 
-    private void validationAchat(){
+    private void validationAchat(View v){
         TextView montantTextView = (TextView) findViewById(R.id.montant);
         String montant = montantTextView.getText().toString();
         TextView detail_achatTextView = (TextView) findViewById(R.id.detail_achat);
@@ -149,11 +155,22 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
                         //erreu de service
                         JsonObject data = responsebody.get("data").getAsJsonObject();
                         String message = data.get("errorMessage").getAsString();
-                        Toast.makeText(getApplication(), message, Toast.LENGTH_LONG).show();
+
+                        AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+                        alert.setTitle("Validation Paiement");
+                        alert.setMessage(message)
+                                .setPositiveButton("OK", null);
+                        AlertDialog alertLogout = alert.create();
+                        alertLogout.show();
 
                     }else{
                         //success
-                        //generer une facture
+
+                        JsonObject data = responsebody.get("data").getAsJsonObject();
+
+                        // Données à afficher
+                        String numeroTransaction = data.get("num_transaction").getAsString();
+                        String numeroTelephone = telephone;
 
                         //consultation de nouveau solde
                         Call<JsonObject> call2 = apiService.getSoldeMarchand("Bearer "+token);
@@ -180,7 +197,13 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
                                         //erreu de service
                                         JsonObject data = responsebody.get("data").getAsJsonObject();
                                         String message = data.get("errorMessage").getAsString();
-                                        Toast.makeText(getApplication(), message, Toast.LENGTH_LONG).show();
+
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+                                        alert.setTitle("Validation Paiement");
+                                        alert.setMessage(message)
+                                                .setPositiveButton("OK", null);
+                                        AlertDialog alertLogout = alert.create();
+                                        alertLogout.show();
 
                                     }else{
                                         preferences = getSharedPreferences(confPref, Context.MODE_PRIVATE);
@@ -190,29 +213,71 @@ public class ValidationCodeActivity extends AppCompatActivity implements Network
                                         editor.putString("solde_carte", ""+data.get("solde_carte").getAsString());
                                         editor.commit();
 
-                                        Intent MainActivity = new Intent(getApplication(), MainActivity.class);
-                                        startActivity(MainActivity);
-                                        finish();
+                                        // Création du texte en utilisant SpannableString pour mettre en forme
+                                        SpannableString message = new SpannableString("Détails de la transaction :\n" +
+                                                "Numéro de transaction : " + numeroTransaction + "\n" +
+                                                "Montant : " + montant + " Ar" + "\n" +
+                                                "Numéro de téléphone : " + numeroTelephone);
+
+                                        // Mettre en gras les parties spécifiques du texte
+                                        StyleSpan boldStyle = new StyleSpan(Typeface.BOLD);
+                                        message.setSpan(boldStyle, message.toString().indexOf("Numéro de transaction"), message.toString().indexOf("Numéro de transaction") + "Numéro de transaction".length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                                        message.setSpan(boldStyle, message.toString().indexOf("Montant"), message.toString().indexOf("Montant") + "Montant".length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                                        message.setSpan(boldStyle, message.toString().indexOf("Numéro de téléphone"), message.toString().indexOf("Numéro de téléphone") + "Numéro de téléphone".length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+                                        alert.setTitle("Validation Paiement");
+                                        alert.setMessage(message)
+                                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent MainActivity = new Intent(getApplication(), MainActivity.class);
+                                                        startActivity(MainActivity);
+                                                        finish();
+                                                    }
+                                                });
+                                        AlertDialog alertLogout = alert.create();
+                                        alertLogout.show();
                                     }
 
                                 }else{
-                                    Toast.makeText(getApplication(), "ERREUR DE SERVICE", Toast.LENGTH_LONG).show();
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+                                    alert.setTitle("Validation Paiement");
+                                    alert.setMessage("ERREUR SERVICE !")
+                                            .setPositiveButton("OK", null);
+                                    AlertDialog alertLogout = alert.create();
+                                    alertLogout.show();
                                 }
                             }
                             @Override
                             public void onFailure(Call<JsonObject> call, Throwable t) {
-                                Toast.makeText(getApplication(), "ERREUR SERVEUR", Toast.LENGTH_LONG).show();
+                                AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+                                alert.setTitle("Validation Paiement");
+                                alert.setMessage("ERREUR SERVEUR !")
+                                        .setPositiveButton("OK", null);
+                                AlertDialog alertLogout = alert.create();
+                                alertLogout.show();
                             }
                         });
                     }
                 }else{
-                    Toast.makeText(getApplication(), "ERREUR DE SERVICE", Toast.LENGTH_LONG).show();
+                    AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+                    alert.setTitle("Validation Paiement");
+                    alert.setMessage("ERREUR SERVICE !")
+                            .setPositiveButton("OK", null);
+                    AlertDialog alertLogout = alert.create();
+                    alertLogout.show();
                 }
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Toast.makeText(getApplication(), "ERREUR SERVEUR", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+                alert.setTitle("Validation Paiement");
+                alert.setMessage("ERREUR SERVEUR !")
+                        .setPositiveButton("OK", null);
+                AlertDialog alertLogout = alert.create();
+                alertLogout.show();
             }
         });
 
