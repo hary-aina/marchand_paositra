@@ -114,7 +114,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Détails de l'achat :"
+                            android:text="Commentaire :"
                             android:textStyle="bold"
                             android:textColor="@color/black"/>
 
